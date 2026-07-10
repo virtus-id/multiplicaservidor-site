@@ -1218,6 +1218,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   var sessionId = getCookie(SESSION_COOKIE) || Math.random().toString(36).substring(2, 10);
   setCookie(SESSION_COOKIE, sessionId, SESSION_HOURS);
 
+  var UTM_KEYS = ['utm_source', 'utm_campaign', 'utm_medium', 'utm_content', 'utm_term'];
+
+  function getUtm(key) {
+    var fromUrl = params.get(key);
+    if (fromUrl) return fromUrl;
+    return getCookie(key);
+  }
+
+  // Persiste as UTMs presentes na URL para que a próxima página do funil
+  // (ex: upsell) consiga recuperá-las mesmo se o redirect não repassar a query string
+  UTM_KEYS.forEach(function (k) {
+    var v = params.get(k);
+    if (v) setCookie(k, v, SESSION_HOURS);
+  });
+
   function getFbclid() {
     var fromUrl = params.get('fbclid');
     if (fromUrl) return fromUrl;
@@ -1245,15 +1260,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   if (gclidNow) setCookie('gclid', gclidNow, 90 * 24);
 
   window.addEventListener('DOMContentLoaded', function () {
-    var utmKeys = ['utm_source', 'utm_campaign', 'utm_medium', 'utm_content', 'utm_term'];
-
     function buildXcod() {
       return [
-        params.get('utm_source')   || '',
-        params.get('utm_campaign') || '',
-        params.get('utm_medium')   || '',
-        params.get('utm_content')  || '',
-        params.get('utm_term')     || '',
+        getUtm('utm_source')   || '',
+        getUtm('utm_campaign') || '',
+        getUtm('utm_medium')   || '',
+        getUtm('utm_content')  || '',
+        getUtm('utm_term')     || '',
         sessionId,                          // parts[5]
         VIRTUS_PROJECT                      // parts[6] — roteamento multi-tenant no n8n
       ].map(function (v) { return encodeURIComponent(v || ''); }).join('~');
@@ -1263,11 +1276,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       var xcod = buildXcod();
       document.querySelectorAll('a[href*="pay.hotmart.com"]').forEach(function (link) {
         var url = new URL(link.href);
-        utmKeys.forEach(function (k) {
-          var v = params.get(k);
+        UTM_KEYS.forEach(function (k) {
+          var v = getUtm(k);
           if (v) url.searchParams.set(k, v);
         });
-        var srcLegivel = utmKeys.map(function (k) { return params.get(k) || ''; }).filter(Boolean).join(' | ');
+        var srcLegivel = UTM_KEYS.map(function (k) { return getUtm(k) || ''; }).filter(Boolean).join(' | ');
         url.searchParams.set('src', srcLegivel);
         url.searchParams.delete('xcod');
         link.href = url.toString() + '&xcod=' + xcod;
