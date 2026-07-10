@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Protocolo TRV — Servidor Sem Dívidas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet" />
+
+  <script>!function(i,n){i._plt=i._plt||(n&&n.timeOrigin?n.timeOrigin+n.now():Date.now())}(window,performance);</script>
+  <link rel="preload" href="https://scripts.converteai.net/475b3a00-efd9-4703-a92e-4aab72144f91/players/69d7945189a70332536e0bc3/v4/player.js" as="script">
+  <link rel="preload" href="https://scripts.converteai.net/lib/js/smartplayer-wc/v4/smartplayer.js" as="script">
+  <link rel="preload" href="https://cdn.converteai.net/475b3a00-efd9-4703-a92e-4aab72144f91/69d793bceeab8ff9b72e45ee/main.m3u8" as="fetch">
+  <link rel="dns-prefetch" href="https://cdn.converteai.net">
+  <link rel="dns-prefetch" href="https://scripts.converteai.net">
+  <link rel="dns-prefetch" href="https://images.converteai.net">
+  <link rel="dns-prefetch" href="https://api.vturb.com.br">
+  <style>
+    /* ─── RESET ─────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #ffffff;
+      color: #0f172a;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    img { display: block; max-width: 100%; }
+    a { text-decoration: none; color: inherit; }
+
+    /* ─── TOKENS (LIGHT) ─────────────────────────── */
+    :root {
+      --green:       #16a34a;
+      --green-dark:  #15803d;
+      --green-glow:  rgba(22,163,74,.2);
+      --gold:        #d97706;
+      --gold-light:  rgba(217,119,6,.08);
+      --red:         #dc2626;
+      --bg-0:        #ffffff;
+      --bg-1:        #f8fafc;
+      --bg-2:        #ffffff;
+      --bg-3:        #f1f5f9;
+      --border:      #e2e8f0;
+      --gray:        #475569;
+      --muted:       #94a3b8;
+      --dark:        #0f172a;
+      --radius-sm:   8px;
+      --radius-md:   16px;
+      --radius-lg:   24px;
+      --radius-pill: 999px;
+    }
+
+    /* ─── UTILS ─────────────────────────────────── */
+    .container      { max-width: 780px;  margin: 0 auto; padding: 0 20px; }
+    .container-wide { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+    .text-center { text-align: center; }
+    .text-green  { color: var(--green); }
+    .text-gold   { color: var(--gold); }
+    .text-red    { color: var(--red); }
+    .text-gray   { color: var(--gray); }
+    .text-muted  { color: var(--muted); }
+    .strike      { text-decoration: line-through; color: var(--muted); }
+
+    /* ─── TAG / BADGE ────────────────────────────── */
+    .tag {
+      display: inline-block;
+      background: rgba(22,163,74,.1);
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(22,163,74,.2);
+    }
+    .tag-gold {
+      background: var(--gold-light);
+      color: var(--gold);
+      border-color: rgba(217,119,6,.2);
+    }
+    .tag-red {
+      background: rgba(220,38,38,.08);
+      color: var(--red);
+      border-color: rgba(220,38,38,.2);
+    }
+
+    /* ─── DIVIDER ────────────────────────────────── */
+    .divider { height: 1px; background: var(--border); }
+
+    /* ─── URGENCY BAR ────────────────────────────── */
+    .urgency-bar {
+      background: linear-gradient(90deg, #7f1d1d 0%, #dc2626 50%, #7f1d1d 100%);
+      padding: 11px 20px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      border-bottom: 1px solid rgba(220,38,38,.4);
+    }
+    .urgency-bar p { font-size: 13px; font-weight: 700; color: #fff; }
+    .urgency-bar span {
+      background: rgba(255,255,255,.2);
+      padding: 1px 8px;
+      border-radius: 4px;
+      margin-left: 6px;
+      font-family: monospace;
+      letter-spacing: 2px;
+    }
+
+    /* ─── VTURB ───────────────────────────────────── */
+    .vturb {
+      width: 80%;
+      margin: 0 auto;
+    }
+    .esconder {
+      display: none;
+    }
+
+    /* ─── HERO ───────────────────────────────────── */
+    .hero {
+      padding: 80px 20px 60px;
+      text-align: center;
+      background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(22,163,74,.07) 0%, transparent 70%);
+    }
+    .hero h1 {
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+      margin-bottom: 20px;
+      color: var(--dark);
+    }
+    .hero h1 em { font-style: normal; color: var(--green); }
+    .hero-sub {
+      font-size: clamp(16px, 2vw, 19px);
+      color: var(--gray);
+      max-width: 600px;
+      margin: 0 auto 40px;
+      font-weight: 400;
+      line-height: 1.6;
+    }
+    .hero-proof {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      padding: 8px 18px;
+      font-size: 13px;
+      color: var(--gray);
+      margin-bottom: 40px;
+    }
+    .hero-proof .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      flex-shrink: 0;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .5; transform: scale(.8); }
+    }
+
+    /* ─── SECTION TITLE ──────────────────────────── */
+    .section-title {
+      font-size: clamp(26px, 4vw, 38px);
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: -1px;
+      margin-bottom: 12px;
+      color: var(--dark);
+    }
+    .section-sub { font-size: 16px; color: var(--gray); line-height: 1.6; }
+
+    /* ─── BOTÃO CTA ──────────────────────────────── */
+    .btn-cta {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: var(--green);
+      color: #fff;
+      font-weight: 900;
+      font-size: 17px;
+      padding: 20px 40px;
+      border-radius: var(--radius-pill);
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all .2s ease;
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+      letter-spacing: .2px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 24px var(--green-glow);
+    }
+    .btn-cta::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,.12) 0%, transparent 100%);
+      pointer-events: none;
+    }
+    .btn-cta:hover {
+      background: var(--green-dark);
+      transform: translateY(-3px);
+      box-shadow: 0 20px 40px var(--green-glow);
+    }
+    .btn-cta .btn-label { font-size: 18px; }
+    .btn-cta .btn-sub { font-size: 12px; font-weight: 500; color: rgba(255,255,255,.75); margin-top: 2px; }
+    .btn-security {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ─── MOCKUP: PLATAFORMA ─────────────────────── */
+    .mockup-platform {
+      background: var(--bg-1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      max-width: 680px;
+      margin: 0 auto;
+      box-shadow: 0 24px 60px rgba(15,23,42,.1), 0 0 0 1px rgba(0,0,0,.04);
+    }
+    .mockup-topbar {
+      background: #e2e8f0;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+    .mockup-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .mockup-dot.red   { background: #ef4444; }
+    .mockup-dot.amber { background: #f59e0b; }
+    .mockup-dot.green { background: #22c55e; }
+    .mockup-url {
+      flex: 1;
+      background: rgba(0,0,0,.06);
+      border-radius: 6px;
+      padding: 4px 12px;
+      font-size: 11px;
+      color: var(--muted);
+      margin-left: 8px;
+    }
+    .mockup-body { padding: 24px; }
+    .mockup-header-bar {
+      background: var(--dark);
+      padding: 14px 20px;
+      border-radius: var(--radius-md);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .mockup-header-bar .title { font-size: 14px; font-weight: 700; color: #fff; }
+    .mockup-header-bar .badge {
+      font-size: 11px; font-weight: 700;
+      background: var(--green); color: #fff;
+      padding: 3px 10px; border-radius: var(--radius-pill);
+    }
+    .mockup-phases { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .mockup-phase {
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+    }
+    .mockup-phase .phase-label { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+    .mockup-phase .phase-name { font-size: 14px; font-weight: 800; color: var(--dark); margin-bottom: 8px; }
+    .mockup-phase .phase-days { font-size: 11px; color: var(--gray); }
+    .mockup-phase.active { border-color: rgba(22,163,74,.3); background: rgba(22,163,74,.05); }
+    .mockup-phase.active .phase-label { color: var(--green); }
+    .mockup-lessons { display: flex; flex-direction: column; gap: 8px; }
+    .mockup-lesson {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 12px; color: var(--gray);
+    }
+    .mockup-lesson .lesson-num {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: var(--bg-3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 700;
+      color: var(--muted); flex-shrink: 0;
+    }
+    .mockup-lesson.done .lesson-num { background: var(--green); color: #fff; }
+    .mockup-lesson.done { color: var(--dark); }
+    .mockup-lesson .lesson-title { flex: 1; font-weight: 500; }
+    .mockup-lesson .lesson-time { font-size: 10px; color: var(--muted); }
+    .mockup-progress {
+      margin-top: 16px; padding: 12px 14px;
+      background: #fff; border-radius: var(--radius-sm); border: 1px solid var(--border);
+    }
+    .mockup-progress .prog-label {
+      display: flex; justify-content: space-between;
+      font-size: 11px; color: var(--muted); margin-bottom: 8px;
+    }
+    .mockup-progress .prog-bar { height: 4px; background: var(--bg-3); border-radius: 2px; overflow: hidden; }
+    .mockup-progress .prog-fill { height: 100%; background: var(--green); border-radius: 2px; width: 50%; }
+
+    /* ─── STACK DE VALOR ─────────────────────────── */
+    .stack-section { background: var(--bg-1); padding: 80px 20px; }
+    .stack-grid { display: flex; flex-direction: column; gap: 16px; margin-top: 48px; }
+    .stack-item {
+      display: flex; align-items: flex-start; gap: 20px;
+      background: var(--bg-0);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      transition: border-color .2s, box-shadow .2s;
+      box-shadow: 0 1px 4px rgba(15,23,42,.04);
+    }
+    .stack-item:hover {
+      border-color: rgba(22,163,74,.3);
+      box-shadow: 0 4px 20px rgba(22,163,74,.08);
+    }
+    .stack-icon-wrap {
+      width: 52px; height: 52px;
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; flex-shrink: 0;
+    }
+    .stack-icon-wrap.green  { background: rgba(22,163,74,.1); }
+    .stack-icon-wrap.gold   { background: var(--gold-light); }
+    .stack-icon-wrap.purple { background: rgba(168,85,247,.1); }
+    .stack-icon-wrap.blue   { background: rgba(59,130,246,.1); }
+    .stack-icon-wrap.orange { background: rgba(249,115,22,.1); }
+    .stack-content { flex: 1; }
+    .stack-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+    .stack-name { font-size: 17px; font-weight: 800; color: var(--dark); margin-bottom: 6px; line-height: 1.3; }
+    .stack-desc { font-size: 14px; color: var(--gray); line-height: 1.5; }
+    .stack-value { display: flex; flex-direction: column; align-items: flex-end; flex-shrink: 0; }
+    .stack-de { font-size: 11px; color: var(--muted); }
+    .stack-por { font-size: 16px; font-weight: 800; color: var(--green); }
+    .stack-bonus-label {
+      font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+      background: var(--gold-light); color: var(--gold);
+      padding: 2px 8px; border-radius: var(--radius-pill); margin-top: 4px;
+    }
+    .stack-total-row {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--bg-1);
+      border: 1px solid rgba(22,163,74,.2);
+      border-radius: var(--radius-md);
+      padding: 20px 24px; margin-top: 8px;
+    }
+    .stack-total-row .label { font-size: 14px; font-weight: 600; color: var(--gray); }
+    .stack-total-row .value { font-size: 22px; font-weight: 900; color: var(--dark); }
+
+    /* ─── PROVA SOCIAL ───────────────────────────── */
+    .proof-section { padding: 80px 20px; background: var(--bg-0); }
+    .proof-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 48px; }
+    @media (max-width: 600px) { .proof-grid { grid-template-columns: 1fr; } }
+    .proof-card {
+      background: var(--bg-1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 28px;
+      box-shadow: 0 1px 4px rgba(15,23,42,.05);
+    }
+    .proof-card-header {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 20px; padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .proof-avatar {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: var(--bg-3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      border: 2px solid var(--border); flex-shrink: 0;
+    }
+    .proof-name { font-size: 15px; font-weight: 700; color: var(--dark); }
+    .proof-role { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .proof-result {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(22,163,74,.08);
+      border: 1px solid rgba(22,163,74,.2);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px; margin-bottom: 16px;
+    }
+    .proof-result .result-icon { font-size: 18px; }
+    .proof-result .result-text { font-size: 13px; font-weight: 700; color: var(--green); }
+    .proof-quote { font-size: 14px; color: var(--gray); line-height: 1.6; font-style: italic; }
+    .proof-quote strong { color: var(--dark); font-style: normal; }
+    .proof-numbers { display: flex; gap: 12px; margin-top: 16px; }
+    .proof-num-item {
+      flex: 1; background: var(--bg-0);
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 10px 12px; text-align: center;
+    }
+    .proof-num-item .num { font-size: 16px; font-weight: 900; color: var(--green); }
+    .proof-num-item .num-label { font-size: 10px; color: var(--muted); margin-top: 2px; line-height: 1.3; }
+    .proof-counter {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      background: var(--bg-1);
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+      padding: 20px 32px; margin: 40px auto 0; max-width: 420px;
+      box-shadow: 0 1px 4px rgba(15,23,42,.05);
+    }
+    .proof-counter .count-num { font-size: 40px; font-weight: 900; color: var(--green); line-height: 1; }
+    .proof-counter .count-text { font-size: 14px; color: var(--gray); max-width: 200px; line-height: 1.4; }
+    .proof-counter .count-text strong { color: var(--dark); }
+
+    /* ─── GARANTIA ───────────────────────────────── */
+    .guarantee-section { padding: 80px 20px; background: var(--bg-1); }
+    .guarantee-card {
+      background: var(--bg-0);
+      border: 1px solid rgba(22,163,74,.25);
+      border-radius: var(--radius-lg);
+      padding: 48px 40px;
+      display: flex; align-items: flex-start; gap: 32px;
+      max-width: 700px; margin: 0 auto;
+      box-shadow: 0 4px 24px rgba(22,163,74,.06);
+    }
+    @media (max-width: 600px) {
+      .guarantee-card { flex-direction: column; align-items: center; text-align: center; padding: 32px 24px; gap: 20px; }
+    }
+    .guarantee-badge {
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      background: rgba(22,163,74,.08);
+      border: 2px solid rgba(22,163,74,.3);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .guarantee-badge .badge-num { font-size: 32px; font-weight: 900; color: var(--green); line-height: 1; }
+    .guarantee-badge .badge-unit { font-size: 10px; font-weight: 700; color: var(--green); letter-spacing: 1px; }
+    .guarantee-content h3 { font-size: 22px; font-weight: 800; margin-bottom: 10px; color: var(--dark); }
+    .guarantee-content p { font-size: 15px; color: var(--gray); line-height: 1.6; margin-bottom: 16px; }
+    .guarantee-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .guarantee-list li { display: flex; align-items: flex-start; gap: 8px; font-size: 14px; color: var(--gray); }
+    .guarantee-list li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
+
+    /* ─── OFERTA / PREÇO ─────────────────────────── */
+    .offer-section {
+      padding: 80px 20px;
+      background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(22,163,74,.06) 0%, transparent 70%);
+    }
+    .offer-card {
+      background: var(--bg-0);
+      border: 1px solid rgba(22,163,74,.25);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      max-width: 680px; margin: 48px auto 0;
+      box-shadow: 0 20px 60px rgba(15,23,42,.1), 0 0 0 1px rgba(22,163,74,.08);
+    }
+    .offer-card-top {
+      background: linear-gradient(135deg, rgba(22,163,74,.1) 0%, rgba(22,163,74,.03) 100%);
+      border-bottom: 1px solid rgba(22,163,74,.15);
+      padding: 32px 36px 28px; text-align: center;
+    }
+    .offer-card-top .offer-title { font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--green); margin-bottom: 8px; }
+    .offer-card-top h2 { font-size: clamp(20px, 3vw, 26px); font-weight: 900; color: var(--dark); }
+    .offer-card-body { padding: 32px 36px; }
+    @media (max-width: 600px) { .offer-card-top, .offer-card-body { padding: 24px 20px; } }
+    .offer-items { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+    .offer-item { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--gray); }
+    .offer-item .check {
+      width: 20px; height: 20px;
+      border-radius: 50%; background: rgba(22,163,74,.12);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .offer-item .check::after { content: '✓'; font-size: 11px; color: var(--green); font-weight: 700; }
+    .offer-item strong { color: var(--dark); }
+    .offer-divider { height: 1px; background: var(--border); margin: 24px 0; }
+    .offer-pricing { text-align: center; margin-bottom: 28px; }
+    .offer-de { font-size: 14px; color: var(--muted); margin-bottom: 4px; }
+    .offer-de span { text-decoration: line-through; }
+    .offer-discount-badge {
+      display: inline-block;
+      background: rgba(220,38,38,.08); color: var(--red);
+      font-size: 12px; font-weight: 700;
+      padding: 3px 12px; border-radius: var(--radius-pill);
+      border: 1px solid rgba(220,38,38,.2); margin-bottom: 12px;
+    }
+    .offer-price-main { font-size: 52px; font-weight: 900; color: var(--dark); line-height: 1; letter-spacing: -2px; }
+    .offer-price-main .currency { font-size: 24px; font-weight: 700; vertical-align: super; letter-spacing: 0; }
+    .offer-price-or { font-size: 14px; color: var(--muted); margin: 10px 0 4px; }
+    .offer-price-parcel { font-size: 18px; font-weight: 700; color: var(--gray); }
+    .offer-price-parcel strong { color: var(--dark); }
+    .offer-total-value { font-size: 13px; color: var(--muted); margin-top: 6px; }
+    .offer-total-value strong { color: var(--green); }
+    .offer-cta-wrap { display: flex; flex-direction: column; align-items: stretch; gap: 10px; }
+    .offer-expires { font-size: 12px; color: var(--red); font-weight: 600; text-align: center; }
+
+    /* ─── FAQ ────────────────────────────────────── */
+    .faq-section { padding: 80px 20px; background: var(--bg-1); }
+    .faq-list { margin-top: 48px; display: flex; flex-direction: column; gap: 2px; }
+    .faq-item {
+      background: var(--bg-0);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md); overflow: hidden;
+      box-shadow: 0 1px 3px rgba(15,23,42,.04);
+    }
+    .faq-question {
+      width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      padding: 20px 24px; background: none; border: none; cursor: pointer;
+      color: var(--dark); font-size: 15px; font-weight: 700; text-align: left; font-family: inherit;
+    }
+    .faq-question .faq-icon {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--bg-3);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 14px; color: var(--gray); transition: transform .3s;
+    }
+    .faq-item.open .faq-icon { transform: rotate(45deg); }
+    .faq-answer { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+    .faq-item.open .faq-answer { max-height: 300px; }
+    .faq-answer-inner {
+      padding: 0 24px 20px; padding-top: 16px;
+      font-size: 14px; color: var(--gray); line-height: 1.7;
+      border-top: 1px solid var(--border);
+    }
+    .faq-answer-inner strong { color: var(--dark); }
+
+    /* ─── CAMINHO A VS B ─────────────────────────── */
+    .path-section { padding: 80px 20px; background: var(--bg-0); }
+    .path-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 48px; }
+    @media (max-width: 600px) { .path-grid { grid-template-columns: 1fr; } }
+    .path-card { border-radius: var(--radius-md); padding: 28px; border: 1px solid; }
+    .path-card.path-a { background: rgba(220,38,38,.03); border-color: rgba(220,38,38,.15); }
+    .path-card.path-b { background: rgba(22,163,74,.04); border-color: rgba(22,163,74,.2); }
+    .path-label { font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 6px; }
+    .path-a .path-label { color: var(--red); }
+    .path-b .path-label { color: var(--green); }
+    .path-title { font-size: 18px; font-weight: 800; margin-bottom: 20px; line-height: 1.25; }
+    .path-a .path-title { color: var(--dark); }
+    .path-b .path-title { color: var(--green); }
+    .path-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .path-list li { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--gray); line-height: 1.4; }
+    .path-list li .li-icon { flex-shrink: 0; margin-top: 1px; }
+    .path-a .path-list li .li-icon { color: var(--red); }
+    .path-b .path-list li .li-icon { color: var(--green); }
+
+    /* ─── FINAL CTA ──────────────────────────────── */
+    .final-cta-section {
+      padding: 80px 20px 100px; text-align: center;
+      background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(22,163,74,.07) 0%, transparent 70%);
+    }
+    .final-cta-section h2 {
+      font-size: clamp(28px, 4.5vw, 44px);
+      font-weight: 900; letter-spacing: -1px; line-height: 1.1; margin-bottom: 16px;
+      color: var(--dark);
+    }
+
+    /* ─── FOOTER ─────────────────────────────────── */
+    .footer { background: var(--bg-1); border-top: 1px solid var(--border); padding: 32px 20px; text-align: center; }
+    .footer .footer-logo { font-size: 14px; font-weight: 800; color: var(--dark); margin-bottom: 12px; }
+    .footer p { font-size: 12px; color: var(--muted); line-height: 1.7; }
+
+    /* ─── RESPONSIVE ─────────────────────────────── */
+    @media (max-width: 640px) {
+      /* Globals */
+      .container, .container-wide { padding: 0 16px; }
+
+      /* Urgency bar */
+      .urgency-bar { padding: 10px 12px; }
+      .urgency-bar p { font-size: 11px; line-height: 1.5; }
+
+      /* Hero */
+      .hero { padding: 48px 16px 40px; }
+      .hero-proof { font-size: 12px; padding: 6px 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+      /* Mockup */
+      .mockup-platform { border-radius: var(--radius-md); }
+      .mockup-body { padding: 14px; }
+      .mockup-header-bar { flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px 12px; }
+      .mockup-header-bar .title { font-size: 12px; }
+      .mockup-url { font-size: 9px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .mockup-phases { grid-template-columns: 1fr; }
+      .mockup-phase { padding: 12px; }
+      .mockup-lesson { padding: 8px 10px; gap: 8px; }
+      .mockup-lesson .lesson-title { font-size: 11px; }
+      .mockup-lesson .lesson-time { display: none; }
+
+      /* Stack section */
+      .stack-section { padding: 60px 16px; }
+      .stack-item { flex-direction: column; gap: 12px; }
+      .stack-icon-wrap { width: 44px; height: 44px; font-size: 20px; }
+      .stack-value { flex-direction: row; align-items: center; gap: 16px; padding-top: 10px; border-top: 1px solid var(--border); }
+
+      /* Proof */
+      .proof-section { padding: 60px 16px; }
+      .proof-grid { grid-template-columns: 1fr; }
+      .proof-card { padding: 20px; }
+      .proof-counter { padding: 16px 20px; gap: 14px; }
+      .proof-counter .count-num { font-size: 32px; }
+
+      /* Guarantee */
+      .guarantee-section { padding: 60px 16px; }
+      .guarantee-card { flex-direction: column; align-items: center; text-align: center; padding: 28px 20px; gap: 16px; }
+
+      /* Offer */
+      .offer-section { padding: 60px 16px; }
+      .offer-card-top, .offer-card-body { padding: 22px 16px; }
+      .offer-price-main { font-size: 40px; letter-spacing: -1px; }
+      .stack-total-row { flex-direction: column; gap: 4px; text-align: center; }
+
+      /* FAQ */
+      .faq-section { padding: 60px 16px; }
+      .faq-question { font-size: 13px; padding: 16px 18px; gap: 10px; }
+      .faq-answer-inner { padding: 0 18px 18px; padding-top: 14px; }
+
+      /* Path */
+      .path-section { padding: 60px 16px; }
+      .path-grid { grid-template-columns: 1fr; }
+      .path-card { padding: 22px; }
+
+      /* Final CTA */
+      .final-cta-section { padding: 60px 16px 72px; }
+
+      /* Button */
+      .btn-cta { max-width: 100%; font-size: 15px; padding: 18px 20px; }
+      .btn-cta .btn-label { font-size: 16px; }
+
+      /* Sections genéricas */
+      .stack-section, .proof-section, .guarantee-section,
+      .offer-section, .faq-section, .path-section,
+      .final-cta-section { padding-top: 56px; padding-bottom: 56px; }
+    }
+  </style>
+  <!-- Meta Pixel -->
+  <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '2207081926775726');
+    fbq('track', 'PageView');
+  </script>
+  <noscript>
+    <img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=2207081926775726&ev=PageView&noscript=1"/>
+  </noscript>
+<!-- End Meta Pixel -->
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NPRH6689');</script>
+<!-- End Google Tag Manager -->
+</head>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "v0gbp0ibxx");
+</script>
+
+<body>
+
+<div class="vturb">
+	<vturb-smartplayer id="ab-6a23210db3e8dcfa8175eff2" style="display: block; margin: 0 auto; width: 100%; "></vturb-smartplayer> <script type="text/javascript"> var s=document.createElement("script"); s.src="https://scripts.converteai.net/475b3a00-efd9-4703-a92e-4aab72144f91/ab-test/6a23210db3e8dcfa8175eff2/player.js", s.async=!0,document.head.appendChild(s); </script>
+</div>
+
+<div class="esconder">
+
+<!-- URGENCY BAR -->
+  <div class="urgency-bar">
+    <p>⚠️ Seu cupom exclusivo de 50% está ativo — válido apenas enquanto esta página estiver aberta <span id="timer">--:--</span></p>
+  </div>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="container text-center">
+      <div class="tag" style="margin-bottom:20px">Protocolo TRV — Servidor Sem Dívidas</div>
+      <h1>Você já sabe o problema.<br />Você já sabe a solução.<br />Agora é hora de <em>agir.</em></h1>
+      <p class="hero-sub">Em 28 dias, você vai sair das dívidas com estratégia e se tornar incompatível com endividamento — para nunca mais voltar.</p>
+      <div class="hero-proof">
+        <span class="dot"></span>
+        847 servidores já aplicaram o Protocolo TRV
+      </div>
+
+      <!-- MOCKUP DA PLATAFORMA -->
+      <div class="mockup-platform">
+        <div class="mockup-topbar">
+          <span class="mockup-dot red"></span>
+          <span class="mockup-dot amber"></span>
+          <span class="mockup-dot green"></span>
+          <div class="mockup-url">protocolo-trv.rodrigochebli.com.br/meu-acesso</div>
+        </div>
+        <div class="mockup-body">
+          <div class="mockup-header-bar">
+            <div class="title">Protocolo TRV — Servidor Sem Dívidas</div>
+            <div class="badge">ACESSO LIBERADO</div>
+          </div>
+          <div class="mockup-phases">
+            <div class="mockup-phase active">
+              <div class="phase-label">Fase 1</div>
+              <div class="phase-name">SAIR</div>
+              <div class="phase-days">Dias 1–14 · 14 aulas</div>
+            </div>
+            <div class="mockup-phase">
+              <div class="phase-label">Fase 2</div>
+              <div class="phase-name">NUNCA VOLTAR</div>
+              <div class="phase-days">Dias 15–28 · 14 aulas</div>
+            </div>
+          </div>
+          <div class="mockup-lessons">
+            <div class="mockup-lesson done">
+              <div class="lesson-num">✓</div>
+              <div class="lesson-title">Dia 1 — O Pacto da Virada</div>
+              <div class="lesson-time">12 min</div>
+            </div>
+            <div class="mockup-lesson done">
+              <div class="lesson-num">✓</div>
+              <div class="lesson-title">Dia 3 — O Controle Absoluto</div>
+              <div class="lesson-time">18 min</div>
+            </div>
+            <div class="mockup-lesson done">
+              <div class="lesson-num">✓</div>
+              <div class="lesson-title">Dia 7 — Sua primeira vitória consciente</div>
+              <div class="lesson-time">21 min</div>
+            </div>
+            <div class="mockup-lesson">
+              <div class="lesson-num">4</div>
+              <div class="lesson-title">Dia 11 — Portabilidade estratégica</div>
+              <div class="lesson-time">15 min</div>
+            </div>
+            <div class="mockup-lesson">
+              <div class="lesson-num">5</div>
+              <div class="lesson-title">Dia 14 — Sua primeira sobra financeira</div>
+              <div class="lesson-time">19 min</div>
+            </div>
+          </div>
+          <div class="mockup-progress">
+            <div class="prog-label">
+              <span>Progresso da Fase 1</span>
+              <span style="color:var(--green);font-weight:700">7 de 14 aulas</span>
+            </div>
+            <div class="prog-bar"><div class="prog-fill"></div></div>
+          </div>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- STACK DE VALOR -->
+  <div class="stack-section" id="stack-section">
+    <div class="container">
+      <div class="text-center">
+        <div class="tag" style="margin-bottom:16px">O que você recebe</div>
+        <h2 class="section-title">Tudo que está incluído<br />no <span class="text-green">Protocolo TRV</span></h2>
+        <p class="section-sub" style="margin-top:8px">Um sistema completo, específico para servidor público — do diagnóstico à nova identidade financeira.</p>
+      </div>
+      <div class="stack-grid">
+
+        <div class="stack-item">
+          <div class="stack-icon-wrap green">🎯</div>
+          <div class="stack-content">
+            <div class="stack-label">Principal</div>
+            <div class="stack-name">Protocolo TRV Completo</div>
+            <div class="stack-desc">28 aulas práticas — 1 por dia — cobrindo as 3 fases: <strong>Tática</strong> (choque de realidade), <strong>Rompimento</strong> (intervenção nas dívidas) e <strong>Virada</strong> (nova identidade financeira). Específico para a realidade do servidor público: margem consignável, portabilidade e folha de pagamento.</div>
+          </div>
+          <div class="stack-value">
+            <div class="stack-de">de <span class="strike">R$1.497</span></div>
+            <div class="stack-por">Incluso</div>
+          </div>
+        </div>
+
+        <div class="stack-item">
+	  <div class="stack-icon-wrap blue">🔍</div>
+          <div class="stack-content">
+            <div class="stack-label">Bônus 1</div>
+            <div class="stack-name">Raio-X do Servidor Endividado</div>
+            <div class="stack-desc">Diagnóstico dos <strong>12 perfis de endividamento</strong> específicos do servidor. Em 15 minutos você descobre exatamente em qual perfil você se encaixa — e qual caminho seguir.</div>
+          </div>
+          <div class="stack-value">
+            <div class="stack-de">de <span class="strike">R$97</span></div>
+            <div class="stack-por text-green">Grátis</div>
+          </div>
+        </div>
+
+        <div class="stack-item">
+          <div class="stack-icon-wrap purple">⚡</div>
+          <div class="stack-content">
+            <div class="stack-label">Bônus 2</div>
+            <div class="stack-name">Kit de Ataque às Dívidas</div>
+            <div class="stack-desc">Scripts prontos de renegociação e templates de portabilidade, <strong>palavra por palavra</strong>. Você fala com o banco sabendo exatamente o que dizer — e o que nunca dizer.</div>
+          </div>
+          <div class="stack-value">
+            <div class="stack-de">de <span class="strike">R$197</span></div>
+            <div class="stack-por text-green">Grátis</div>
+          </div>
+        </div>
+
+        <div class="stack-item">
+          <div class="stack-icon-wrap orange">📊</div>
+          <div class="stack-content">
+            <div class="stack-label">Bônus 3</div>
+            <div class="stack-name">Planilha de Orçamento Familiar Estratégico</div>
+            <div class="stack-desc">Integrada ao Raio-X, projetada para a realidade do servidor. <strong>10 minutos por semana</strong> — e você tem controle total de onde cada real vai.</div>
+          </div>
+          <div class="stack-value">
+            <div class="stack-de">de <span class="strike">R$147</span></div>
+            <div class="stack-por text-green">Grátis</div>
+          </div>
+        </div>
+
+        <div class="stack-item" style="border-color:rgba(217,119,6,.25);background:rgba(217,119,6,.03)">
+          <div class="stack-icon-wrap gold">🎁</div>
+          <div class="stack-content">
+            <div class="stack-label" style="color:var(--gold)">Bônus Exclusivo — Primeiros 50 alunos</div>
+            <div class="stack-name">Playbook: Meu Primeiro Investimento</div>
+            <div class="stack-desc">O guia de passagem que transforma você de <em>"servidor que quita dívidas"</em> em <strong>"servidor que constrói patrimônio"</strong> — a mesma estratégia que o Rodrigo usou para ir de dívidas a ações, fundos imobiliários e Tesouro Direto.</div>
+          </div>
+          <div class="stack-value">
+            <div class="stack-de">de <span class="strike">R$197</span></div>
+            <div class="stack-por text-gold">Grátis</div>
+            <div class="stack-bonus-label">Limitado</div>
+          </div>
+        </div>
+
+        <div class="stack-total-row">
+          <div class="label">Valor total do que você recebe</div>
+          <div class="value"><span class="strike" style="font-size:16px;margin-right:10px;color:var(--muted)">R$2.135</span></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- PROVA SOCIAL -->
+  <div class="proof-section">
+    <div class="container">
+      <div class="text-center">
+        <div class="tag" style="margin-bottom:16px">Resultados reais</div>
+        <h2 class="section-title">Não é teoria.<br /><span class="text-green">Já funcionou com eles.</span></h2>
+        <p class="section-sub" style="margin-top:8px">Esses resultados não acontecem porque as pessoas são "especiais".<br/>Acontecem porque o sistema é específico.</p>
+      </div>
+      <div class="proof-grid">
+
+        <div class="proof-card">
+          <div class="proof-card-header">
+            <div class="proof-avatar">👩‍⚕️</div>
+            <div>
+              <div class="proof-name">Maria S.</div>
+              <div class="proof-role">Enfermeira · 52 anos · Servidora Municipal</div>
+            </div>
+          </div>
+          <div class="proof-result">
+            <div class="result-icon">💰</div>
+            <div class="result-text">R$ 47.000 economizados em juros</div>
+          </div>
+          <p class="proof-quote">"Eu tinha <strong>R$85 mil em consignados</strong> e meu casamento estava se desfazendo. Quando consegui baixar a parcela de R$2.400 pra R$1.750, os R$650 que sobraram… a gente foi jantar fora pela primeira vez em 3 anos. <strong>Rodrigo, eu tinha esquecido como é olhar pro meu marido e sentir que a gente é um time.</strong>"</p>
+          <div class="proof-numbers">
+            <div class="proof-num-item">
+              <div class="num">R$650</div>
+              <div class="num-label">a mais por mês no bolso</div>
+            </div>
+            <div class="proof-num-item">
+              <div class="num">2 anos</div>
+              <div class="num-label">sem voltar a se endividar</div>
+            </div>
+            <div class="proof-num-item">
+              <div class="num">20%</div>
+              <div class="num-label">os que nunca voltam</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="proof-card">
+          <div class="proof-card-header">
+            <div class="proof-avatar">👨‍💼</div>
+            <div>
+              <div class="proof-name">João M.</div>
+              <div class="proof-role">Servidor Federal · 43 anos · Rio de Janeiro</div>
+            </div>
+          </div>
+          <div class="proof-result">
+            <div class="result-icon">📉</div>
+            <div class="result-text">R$ 38.000 economizados · juros de 13,9% → 1,5%</div>
+          </div>
+          <p class="proof-quote">"Eu sou <strong>servidor público</strong>, tenho estabilidade e não conseguia pagar R$180 de natação pro meu filho de 8 anos. Aquilo me destruiu. <strong>Rodrigo, obrigado por me devolver a dignidade de ser PAI.</strong>"</p>
+          <div class="proof-numbers">
+            <div class="proof-num-item">
+              <div class="num">R$170</div>
+              <div class="num-label">já na 1ª semana pra natação do filho</div>
+            </div>
+            <div class="proof-num-item">
+              <div class="num">18 meses</div>
+              <div class="num-label">sem voltar a se endividar</div>
+            </div>
+            <div class="proof-num-item">
+              <div class="num">20%</div>
+              <div class="num-label">os que nunca voltam</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="proof-counter">
+        <div class="count-num">847</div>
+        <div class="count-text"><strong>servidores públicos</strong> já aplicaram o Protocolo TRV e saíram das dívidas.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- GARANTIA -->
+  <div class="guarantee-section">
+    <div class="container">
+      <div class="guarantee-card">
+        <div class="guarantee-badge">
+          <div class="badge-num">14</div>
+          <div class="badge-unit">DIAS</div>
+        </div>
+        <div class="guarantee-content">
+          <h3>Garantia de Resultado Mensurável</h3>
+          <p>Você entra no Protocolo TRV, assiste as primeiras 15 aulas e aplica pelo menos uma estratégia. Se até o Dia 14 você <strong>não conseguir nenhum resultado concreto</strong> — renegociar juros, fazer portabilidade, reduzir parcela ou identificar vazamentos — eu devolvo 100% do seu dinheiro.</p>
+          <ul class="guarantee-list">
+            <li>Sem perguntas</li>
+            <li>Sem burocracia</li>
+            <li>Sem enrolação — só mandar um e-mail</li>
+            <li>Risco 100% meu. Benefício 100% seu</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- OFERTA / PREÇO -->
+  <div class="offer-section" id="comprar">
+    <div class="container">
+      <div class="text-center">
+        <div class="tag tag-gold" style="margin-bottom:16px">Oferta exclusiva — Assistiu até o final</div>
+        <h2 class="section-title">Garanta sua vaga <span class="text-green">agora</span></h2>
+        <p class="section-sub" style="margin-top:8px">Este cupom só existe nessa página e expira quando você fechar o navegador.</p>
+      </div>
+
+      <div class="offer-card">
+        <div class="offer-card-top">
+          <div class="offer-title">Protocolo TRV — Servidor Sem Dívidas</div>
+          <h2>28 dias para sair das dívidas<br />e nunca mais voltar.</h2>
+        </div>
+        <div class="offer-card-body">
+          <div class="offer-items">
+            <div class="offer-item"><div class="check"></div><span><strong>Protocolo TRV Completo</strong> — 28 aulas práticas (Tática + Rompimento + Virada)</span></div>
+            <div class="offer-item"><div class="check"></div><span><strong>Raio-X do Servidor Endividado</strong> — diagnóstico dos 12 perfis</span></div>
+            <div class="offer-item"><div class="check"></div><span><strong>Kit de Ataque às Dívidas</strong> — scripts e templates prontos</span></div>
+            <div class="offer-item"><div class="check"></div><span><strong>Planilha de Orçamento Familiar Estratégico</strong> — 10 min/semana</span></div>
+            <div class="offer-item"><div class="check"></div><span style="color:var(--gold)"><strong style="color:var(--gold)">🎁 Playbook: Meu Primeiro Investimento</strong> — para os primeiros 50 alunos</span></div>
+            <div class="offer-item"><div class="check"></div><span style="color:var(--gold)"><strong style="color:var(--gold)">🎁 Bônus surpresa por e-mail</strong> — Portabilidade em Cascata (exclusivo VIP)</span></div>
+          </div>
+          <div class="offer-divider"></div>
+          <div class="offer-pricing">
+            <div class="offer-de">Valor total: <span>R$2.135</span> — Preço normal: <span>R$597</span></div>
+            <div class="offer-discount-badge">CUPOM EXCLUSIVO VSL: 50% OFF</div>
+            <div class="offer-price-main"><span class="currency">R$</span>297</div>
+            <div class="offer-price-or">ou parcelado em</div>
+            <div class="offer-price-parcel"><strong>12×</strong> de R$<strong>30,72</strong> no cartão</div>
+            <div class="offer-total-value">Você economiza <strong>R$300 hoje</strong> — e até R$149 mil em juros ao longo da sua carreira.</div>
+          </div>
+          <div class="offer-cta-wrap">
+            <a href="https://pay.hotmart.com/O104094769J?off=2kzdlx23&checkoutMode=10&&offDiscount=50OFF" class="btn-cta">
+              <span class="btn-label">✅ Quero garantir minha vaga agora</span>
+              <span class="btn-sub">Acesso imediato · Pagamento 100% seguro</span>
+            </a>
+            <p class="offer-expires">⚠️ Cupom ativo apenas enquanto esta página estiver aberta</p>
+            <div class="btn-security">🔒 Ambiente seguro · Hotmart · Cartão, PIX ou boleto</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- FAQ -->
+  <div class="faq-section">
+    <div class="container">
+      <div class="text-center">
+        <div class="tag" style="margin-bottom:16px">Dúvidas frequentes</div>
+        <h2 class="section-title">Respostas rápidas</h2>
+      </div>
+      <div class="faq-list">
+
+        <div class="faq-item open">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            Já tentei me organizar antes e não funcionou. Por que agora vai ser diferente?
+            <div class="faq-icon">+</div>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">Porque você tentou resolver um problema específico de servidor com soluções genéricas feitas para CLT. O Protocolo TRV é o único método desenvolvido <strong>especificamente para a realidade do servidor público</strong> — margem consignável, estabilidade como aliada, portabilidade estratégica. O problema nunca foi você. Foi a ferramenta errada.</div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            Tenho pouco tempo. Conseguirei acompanhar?
+            <div class="faq-icon">+</div>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">O formato é <strong>1 aula por dia</strong>, com média de 25 minutos cada. É menos tempo do que você passa preocupado com a situação financeira. Na Fase 2, você apreder a colocar o sistema para funcionar no <strong>piloto automático</strong> — você investe apenas 10 minutos por semana.</div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            E se eu não tiver consignado — o protocolo serve pra mim?
+            <div class="faq-icon">+</div>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">Sim. O Protocolo TRV cobre cartão de crédito, cheque especial, dívidas diversas e a reconstrução da identidade financeira. <strong>O Raio-X da Semana 1 mapeia exatamente o seu caminho.</strong></div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            Por quanto tempo tenho acesso?
+            <div class="faq-icon">+</div>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner"><strong>Acesso vitalício.</strong> Você pode acessar quando quiser, quantas vezes quiser, incluindo todas as atualizações futuras do protocolo.</div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            E se eu não conseguir resultado nenhum?
+            <div class="faq-icon">+</div>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">Então você não paga. A garantia de 14 dias cobre exatamente isso: você aplica pelo menos uma estratégia e se não houver resultado concreto mensurável, <strong>devolvo 100% do seu investimento sem perguntas.</strong> O risco é meu, não seu.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- CAMINHO A VS B -->
+  <div class="path-section">
+    <div class="container">
+      <div class="text-center">
+        <div class="tag" style="margin-bottom:16px">Sua decisão</div>
+        <h2 class="section-title">Dois caminhos.<br /><span class="text-green">Só um destino muda.</span></h2>
+      </div>
+      <div class="path-grid">
+        <div class="path-card path-a">
+          <div class="path-label">Caminho A — Os 80%</div>
+          <div class="path-title">Fecha essa página.<br />Volta pra rotina.</div>
+          <ul class="path-list">
+            <li><span class="li-icon">✗</span> Daqui 1 ano: mesma situação ou pior</li>
+            <li><span class="li-icon">✗</span> Mais R$12.600 pagos em juros</li>
+            <li><span class="li-icon">✗</span> Mesmas discussões sobre dinheiro em casa</li>
+            <li><span class="li-icon">✗</span> Mesmo aperto no peito às 3h da manhã</li>
+            <li><span class="li-icon">✗</span> Mesma vergonha de abrir o contracheque</li>
+            <li><span class="li-icon">✗</span> Continuando a normalizar o que não deveria ser normal</li>
+          </ul>
+        </div>
+        <div class="path-card path-b">
+          <div class="path-label">Caminho B — Os 20%</div>
+          <div class="path-title">Você clica no botão. Agora.</div>
+          <ul class="path-list">
+            <li><span class="li-icon">✓</span> Dia 10: primeira renegociação real</li>
+            <li><span class="li-icon">✓</span> Dia 28: nova identidade financeira ativada</li>
+            <li><span class="li-icon">✓</span> Daqui 1 ano: milhares de reais economizados no mínimo</li>
+            <li><span class="li-icon">✓</span> Casamento, família e dignidade recuperados</li>
+            <li><span class="li-icon">✓</span> Paz de espírito na hora de abrir o extrato</li>
+            <li><span class="li-icon">✓</span> Nunca mais voltando ao ciclo da dívida</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- FINAL CTA -->
+  <div class="final-cta-section">
+    <div class="container">
+      <div class="tag" style="margin-bottom:20px">Nos 20%... ou nos 80%?</div>
+      <h2>Livre... ou preso?<br /><span class="text-green">Você decide. Agora.</span></h2>
+      <p style="font-size:17px;color:var(--gray);margin:20px auto 40px;max-width:520px;line-height:1.6">
+        Cada mês que você adia é mais um mês pagando juros, mais um "não" pro seu filho, mais um churrasco evitado por vergonha. O botão está aqui. O risco é zero.
+      </p>
+      <div class="final-cta-wrap" style="display:flex;flex-direction:column;align-items:stretch;gap:12px;max-width:520px;margin:0 auto">
+        <a href="https://pay.hotmart.com/O104094769J?off=2kzdlx23&offDiscount=50OFF" class="btn-cta">
+          <span class="btn-label">✅ Garantir minha vaga — R$297</span>
+          <span class="btn-sub">12× de R$30,72 · Acesso imediato · Garantia de 14 dias</span>
+        </a>
+        <div class="btn-security">🔒 Pagamento 100% seguro · Hotmart · Você pode cancelar em até 14 dias</div>
+      </div>
+
+      <div style="margin-top:48px;padding:28px;background:var(--bg-1);border:1px solid var(--border);border-radius:var(--radius-md);max-width:540px;margin-left:auto;margin-right:auto;box-shadow:0 1px 4px rgba(15,23,42,.05)">
+        <p style="font-size:14px;color:var(--gray);font-style:italic;line-height:1.7">
+          "Testado com <strong>847 servidores públicos</strong>. Funcionou com eles. Vai funcionar com você. O Protocolo TRV está aqui."
+        </p>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:16px">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--bg-3);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;border:1px solid var(--border)">👨‍⚖️</div>
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--dark)">Rodrigo Chebli</div>
+            <div style="font-size:12px;color:var(--muted)">Servidor do Judiciário · Especialista em Finanças para Servidores Públicos</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-logo">Rodrigo Chebli · Servidor Sem Dívidas</div>
+      <p>
+        © 2025 Rodrigo Chebli — Todos os direitos reservados.<br />
+      </p>
+      <p class="esconder">
+        Este produto é distribuído pela plataforma Hotmart. A compra é segura e criptografada.<br />
+        Os resultados apresentados são casos reais de alunos e podem variar de acordo com o perfil e dedicação de cada pessoa.
+      </p>
+    </div>
+  </footer>
+
+<script>
+  function toggleFaq(btn) {
+    const item = btn.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+
+  (function () {
+    const key = 'trv_timer_end_light';
+    let end = sessionStorage.getItem(key);
+    if (!end) { end = Date.now() + 10 * 60 * 1000; sessionStorage.setItem(key, end); }
+    end = parseInt(end);
+    function tick() {
+      const diff = Math.max(0, end - Date.now());
+      const m = String(Math.floor(diff / 60000)).padStart(2, '0');
+      const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+      const el = document.getElementById('timer');
+      if (el) el.textContent = m + ':' + s;
+      if (diff > 0) setTimeout(tick, 1000); else if (el) el.textContent = 'ÚLTIMA CHANCE';
+    }
+    tick();
+  })();
+
+  document.querySelectorAll('a[href="#comprar"]').forEach(a => {
+    a.addEventListener('click', e => { e.preventDefault(); document.getElementById('comprar')?.scrollIntoView({ behavior: 'smooth' }); });
+  });
+</script>
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NPRH6689"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<script>
+  var delaySeconds = 2542;
+  var player = document.querySelector("vturb-smartplayer");
+  player.addEventListener("player:ready", function() {
+    player.displayHiddenElements(delaySeconds, [".esconder"], {
+      persist: true
+    });
+  });
+</script>
+
+<script>
+(function () {
+  // ── CONFIGURAÇÃO — só mexa aqui ──────────────────────────────
+  var VIRTUS_PROJECT = 'proj_rodrigo_chebli_ssd';
+  var VIRTUS_N8N     = 'https://n8n.virtusid.com.br';
+  // ─────────────────────────────────────────────────────────────
+  var SESSION_COOKIE = 'vtr_sid';
+  var SESSION_HOURS  = 6; // janela para cobrir checkout + páginas de upsell
+
+  var params    = new URLSearchParams(window.location.search);
+  var ipAddress = '';
+
+  function getCookie(name) {
+    var match = document.cookie.match(new RegExp('(?:^|;\\s*)' + name + '=([^;]+)'));
+    return match ? decodeURIComponent(match[1]) : '';
+  }
+  function setCookie(name, value, hours) {
+    var exp = new Date(Date.now() + hours * 60 * 60 * 1000).toUTCString();
+    document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + exp + '; path=/; SameSite=Lax';
+  }
+
+  // Reaproveita o session_id de uma página anterior do funil (mesmo domínio)
+  var sessionId = getCookie(SESSION_COOKIE) || Math.random().toString(36).substring(2, 10);
+  setCookie(SESSION_COOKIE, sessionId, SESSION_HOURS);
+
+  function getFbclid() {
+    var fromUrl = params.get('fbclid');
+    if (fromUrl) return fromUrl;
+    return getCookie('fbclid');
+  }
+  function getFbp() {
+    return getCookie('_fbp');
+  }
+  function getGclid() {
+    var fromUrl = params.get('gclid');
+    if (fromUrl) return fromUrl;
+    return getCookie('gclid');
+  }
+  function getGaClientId() {
+    var raw = getCookie('_ga');
+    if (!raw) return '';
+    var parts = raw.split('.');
+    return parts.length >= 4 ? parts[2] + '.' + parts[3] : '';
+  }
+
+  var fbclidNow = params.get('fbclid');
+  if (fbclidNow) setCookie('fbclid', fbclidNow, 7 * 24);
+
+  var gclidNow = params.get('gclid');
+  if (gclidNow) setCookie('gclid', gclidNow, 90 * 24);
+
+  window.addEventListener('DOMContentLoaded', function () {
+    var utmKeys = ['utm_source', 'utm_campaign', 'utm_medium', 'utm_content', 'utm_term'];
+
+    function buildXcod() {
+      return [
+        params.get('utm_source')   || '',
+        params.get('utm_campaign') || '',
+        params.get('utm_medium')   || '',
+        params.get('utm_content')  || '',
+        params.get('utm_term')     || '',
+        sessionId,                          // parts[5]
+        VIRTUS_PROJECT                      // parts[6] — roteamento multi-tenant no n8n
+      ].map(function (v) { return encodeURIComponent(v || ''); }).join('~');
+    }
+
+    function atualizaLinks() {
+      var xcod = buildXcod();
+      document.querySelectorAll('a[href*="pay.hotmart.com"]').forEach(function (link) {
+        var url = new URL(link.href);
+        utmKeys.forEach(function (k) {
+          var v = params.get(k);
+          if (v) url.searchParams.set(k, v);
+        });
+        var srcLegivel = utmKeys.map(function (k) { return params.get(k) || ''; }).filter(Boolean).join(' | ');
+        url.searchParams.set('src', srcLegivel);
+        url.searchParams.delete('xcod');
+        link.href = url.toString() + '&xcod=' + xcod;
+      });
+    }
+
+    function salvaSession() {
+      fetch(VIRTUS_N8N + '/webhook/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          project_id:   VIRTUS_PROJECT,
+          session_id:   sessionId,
+          fbp:          getFbp(),
+          fbclid:       getFbclid(),
+          gclid:        getGclid(),
+          ga_client_id: getGaClientId(),
+          user_agent:   navigator.userAgent,
+          ip_address:   ipAddress
+        })
+      }).catch(function () {});
+    }
+
+    fetch('https://api.ipify.org?format=json')
+      .then(function (r) { return r.json(); })
+      .then(function (d) { ipAddress = d.ip; })
+      .catch(function () {})
+      .finally(function () {
+        salvaSession();
+        atualizaLinks();
+        setTimeout(atualizaLinks, 2000);
+      });
+
+    document.addEventListener('click', function (e) {
+      var link = e.target.closest('a[href*="pay.hotmart.com"]');
+      if (!link) return;
+      e.preventDefault();
+      atualizaLinks();
+      window.location.href = link.href;
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
