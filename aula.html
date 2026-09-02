@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seu bônus — Servidor Sem Dívidas</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <link rel="preload" href="https://scripts.converteai.net/475b3a00-efd9-4703-a92e-4aab72144f91/players/6a984e932320b94e394d0e9e/v4/player.js" as="script">
+  <link rel="preload" href="https://scripts.converteai.net/lib/js/smartplayer-wc/v4/smartplayer.js" as="script">
+  <link rel="dns-prefetch" href="https://cdn.converteai.net">
+  <link rel="dns-prefetch" href="https://scripts.converteai.net">
+  <link rel="dns-prefetch" href="https://images.converteai.net">
+  <link rel="dns-prefetch" href="https://api.vturb.com.br">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --yellow:     #facc15;
+      --yellow-dim: rgba(250,204,21,.12);
+      --bg-0:       #0a0a0a;
+      --bg-1:       #141414;
+      --border:     rgba(255,255,255,.09);
+      --text:       #ffffff;
+      --gray:       #a3a3a3;
+      --muted:      #737373;
+      --radius:     20px;
+    }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg-0);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    /* brilho de fundo */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -20% 0 auto 0;
+      height: 70vh;
+      background: radial-gradient(ellipse 60% 60% at 50% 0%, rgba(250,204,21,.14), transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .wrap { position: relative; z-index: 1; max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+
+    /* ─── HEADER ─── */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 22px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 15px; letter-spacing: -.3px; }
+    .brand .mark {
+      width: 30px; height: 30px; border-radius: 9px;
+      background: linear-gradient(135deg, var(--yellow), #eab308);
+      display: grid; place-items: center;
+      font-size: 15px;
+    }
+    .brand small { display: block; font-size: 11px; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+    .live {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-size: 11px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase;
+      color: var(--yellow);
+      background: var(--yellow-dim);
+      border: 1px solid rgba(250,204,21,.28);
+      border-radius: 999px;
+      padding: 6px 14px;
+      white-space: nowrap;
+    }
+    .live .dot {
+      width: 6px; height: 6px; border-radius: 50%; background: var(--yellow);
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.8); } }
+
+    /* ─── HERO ─── */
+    .hero { text-align: center; padding: 56px 0 34px; }
+    .hero h1 {
+      font-size: clamp(28px, 5.2vw, 46px);
+      font-weight: 900;
+      line-height: 1.08;
+      letter-spacing: -1.6px;
+      margin-bottom: 16px;
+    }
+    .hero h1 em { font-style: normal; color: var(--yellow); }
+    .hero p {
+      font-size: clamp(15px, 2vw, 18px);
+      color: var(--gray);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* ─── PLAYER ─── */
+    .player-card {
+      background: var(--bg-1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px;
+      box-shadow: 0 30px 80px -30px rgba(250,204,21,.18), 0 0 0 1px rgba(255,255,255,.02);
+    }
+    .player-card > vturb-smartplayer { border-radius: 12px; overflow: hidden; }
+
+    /* ─── CTA (pronto para o seeding do próximo curso) ─── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 9px;
+      background: var(--yellow); color: #0a0a0a;
+      font-size: 15px; font-weight: 800;
+      padding: 15px 30px;
+      border-radius: 999px;
+      text-decoration: none;
+      transition: transform .15s ease, box-shadow .15s ease;
+      box-shadow: 0 12px 30px -10px rgba(250,204,21,.45);
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 18px 40px -12px rgba(250,204,21,.55); }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      padding: 48px 0 40px;
+      margin-top: 56px;
+      border-top: 1px solid var(--border);
+    }
+    footer strong { color: var(--gray); font-weight: 600; }
+
+    @media (max-width: 600px) {
+      .hero { padding: 40px 0 26px; }
+      .player-card { padding: 6px; border-radius: 16px; }
+      header { padding: 18px 0; }
+      .live { font-size: 10px; padding: 5px 11px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <span class="mark">⚖️</span>
+      <span>Rodrigo Chebli<small>Servidor Sem Dívidas</small></span>
+    </div>
+    <span class="live"><span class="dot"></span> Bônus liberado</span>
+  </header>
+
+  <section class="hero">
+    <h1>Parabéns, você chegou até o fim.<br /><em>Aqui está o seu bônus.</em></h1>
+    <p>Foram 28 aulas — e pouca gente completa todas. Gravei essa aula extra só para quem terminou. Não é desconto nem brinde: é conteúdo novo. Dá o play.</p>
+  </section>
+
+  <div class="player-card">
+    <vturb-smartplayer id="vid-6a984e932320b94e394d0e9e" style="display: block; margin: 0 auto; width: 100%;">
+      <div class="vturb-player-placeholder" style="position: relative; width: 100%; padding: 56.25% 0 0; z-index: 0; background-color: black;"></div>
+    </vturb-smartplayer>
+  </div>
+
+  <footer>
+    <strong>Rodrigo Chebli · Servidor Sem Dívidas</strong><br />
+    © 2026 — Todos os direitos reservados. Conteúdo exclusivo para alunos.
+  </footer>
+
+</div>
+
+<script type="text/javascript">
+  var s = document.createElement("script");
+  s.src = "https://scripts.converteai.net/475b3a00-efd9-4703-a92e-4aab72144f91/players/6a984e932320b94e394d0e9e/v4/player.js";
+  s.async = !0;
+  document.head.appendChild(s);
+</script>
+
+</body>
+</html>
